@@ -1,5 +1,5 @@
 #!/bin/bash
-# Qualcomm Ubuntu platform flashing script
+# Advantech Qualcomm Ubuntu solution flashing script
 # Supported chipsets: QCS6490, QCS9075
 
 if [[ $EUID -eq 0 ]]; then
@@ -7,9 +7,7 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
-###############################################################################
-# Global configuration
-###############################################################################
+# ----- Global Configuration --------------------
 PIDS=()
 LOG_DIR="./qualcomm_flashing_logs"
 FORCE_START=false
@@ -58,7 +56,7 @@ detect_platform() {
     esac
 }
 
-# Verify flashing result.   
+# Verify flashing result.
 verify_success() {
     local log="$1"
     local platform="$2"
@@ -216,7 +214,7 @@ for SN in $SN_LIST; do
 done
 echo "------------------------------------------"
 
-# Confirm before flashing.x
+# Confirm before flashing.
 START=false
 if [ "$FORCE_START" = true ]; then
     echo "[INFO] -f detected: Force starting..."
