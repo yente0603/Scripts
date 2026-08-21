@@ -24,6 +24,7 @@ sudo apt update
 
 # Install the Docker packages
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+sudo usermod -aG docker $USER
 sudo systemctl start docker
 
 # Verify that the installation is successful by running the hello-world image
