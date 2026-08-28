@@ -1,6 +1,27 @@
 #!/bin/bash
-# Advantech Qualcomm Ubuntu solution flashing script
-# Supported chipsets: QCS6490, QCS9075
+# Advantech Qualcomm Flashing Script
+# Supported Chipsets: QCS6490, QCS9075
+# Supported image types:
+#   - Ubuntu
+#   - Qualcomm Linux BSP
+# 
+# Usage:
+#   ./adv_qcom_flash.sh -t <QDL_TOOL_PATH> -i <IMAGE_PATH> -p <SUDO_PASSWORD> -s <UFS|EMMC> [-n N] [-f]
+#
+# Required:
+#   -t <path>        QDL tool directory
+#   -i <path>        BSP image directory
+#   -p <password>    Sudo password
+#   -s <UFS|EMMC>    Storage type
+# 
+# Optional:
+#   -n <N>           Expected device count; auto-start when count matches
+#   -f               Force start without confirmation
+#   -h, --help       Show this help
+# 
+# Note:
+#   Do NOT run this script with sudo or as root.
+#   Devices must be in Qualcomm USB 9008 / QDL mode.
 
 if [[ $EUID -eq 0 ]]; then
     echo "[ERROR] This script must NOT be run as root or with sudo."
@@ -9,7 +30,7 @@ fi
 
 # ----- Global Configuration --------------------
 PIDS=()
-LOG_DIR="./qualcomm_flashing_logs"
+LOG_DIR="/tmp/qualcomm_flashing_logs"
 FORCE_START=false
 EXPECTED_COUNT=0
 AVAILABLE_CIDS="0440|042F"
@@ -176,11 +197,11 @@ while [[ "$#" -gt 0 ]]; do
         -n) EXPECTED_COUNT="$2";            shift 2 ;;
         -h|--help)
             cat <<EOF
-Usage: $0 -t <QDL_TOOL_PATH> -i <IMAGE_PATH> -p <PASSWORD> [-s ufs|emmc] [-n N] [-f]
+Usage: $0 -t <QDL_TOOL_PATH> -i <IMAGE_PATH> -p <PASSWORD> -s <ufs|emmc> [-n N] [-f]
   -t  Path to QDL tool directory
   -i  Path to BSP image directory
   -p  Your sudo password
-  -s  Storage type (default: ufs)
+  -s  Storage type
   -n  Expected device count for auto-start
   -f  Force start without confirmation
 EOF
@@ -190,11 +211,24 @@ EOF
 done
 
 # Validate arguments.
-[[ -z "$QDL_TOOL_PATH" || -z "$IMAGE_PATH" || -z "$PASSWORD" ]] && {
-    echo "[ERROR] Missing required arguments (-t, -i, -p)"
+[[ -z "$QDL_TOOL_PATH" || -z "$IMAGE_PATH" || -z "$PASSWORD" || -z "$STORAGE_TYPE" ]] && {
+    echo "[ERROR] Missing required arguments (-t, -i, -p, -s)"
     exit 1
 }
-[[ -z "$STORAGE_TYPE" ]] && { echo "[WARN] STORAGE empty, defaulting to ufs"; STORAGE_TYPE=ufs; }
+
+# Normalize storage type to lowercase.
+STORAGE_TYPE=$(echo "$STORAGE_TYPE" | tr '[:upper:]' '[:lower:]')
+
+# Validate storage type.
+case "$STORAGE_TYPE" in
+    ufs|emmc)
+        ;;
+    *)
+        echo "[ERROR] Invalid storage type: $STORAGE_TYPE"
+        echo "[ERROR] Supported storage types: ufs, emmc"
+        exit 1
+        ;;
+esac
 
 # Detect connected devices.
 OUTPUT=$(lsusb -v -d 05c6:9008 2>/dev/null | grep iProduct | grep -E "CID:($AVAILABLE_CIDS)_")
