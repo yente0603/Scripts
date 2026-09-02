@@ -33,7 +33,7 @@ PIDS=()
 LOG_DIR="/tmp/qualcomm_flashing_logs"
 FORCE_START=false
 EXPECTED_COUNT=0
-AVAILABLE_CIDS="0440|042F"
+AVAILABLE_CIDS="05C6|0440|042F"
 TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 mkdir -p "$LOG_DIR"
 
@@ -71,6 +71,7 @@ detect_platform() {
           | grep "$sn" \
           | sed -E 's/.*CID:([0-9A-Fa-f]+)_SN:.*/\1/')
     case "$cid" in
+        05C6) echo "QCS5430" ;;
         042F) echo "QCS6490" ;;
         0440) echo "QCS9075" ;;
         *)    echo "UNKNOWN" ;;
