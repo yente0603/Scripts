@@ -1,23 +1,10 @@
 #!/bin/bash
 # Advantech Qualcomm Flashing Script
-# Supported Chipsets: QCS6490, QCS9075
-# Supported image types:
-#   - Ubuntu
-#   - Qualcomm Linux BSP
+# Supported Chipsets: QCS5430, QCS6490, QCS9075
+# Supported Image Types: Ubuntu, Qualcomm Linux BSP
 # 
 # Usage:
 #   ./adv_qcom_flash.sh -t <QDL_TOOL_PATH> -i <IMAGE_PATH> -p <SUDO_PASSWORD> -s <UFS|EMMC> [-n N] [-f]
-#
-# Required:
-#   -t <path>        QDL tool directory
-#   -i <path>        BSP image directory
-#   -p <password>    Sudo password
-#   -s <UFS|EMMC>    Storage type
-# 
-# Optional:
-#   -n <N>           Expected device count; auto-start when count matches
-#   -f               Force start without confirmation
-#   -h, --help       Show this help
 # 
 # Note:
 #   Do NOT run this script with sudo or as root.
